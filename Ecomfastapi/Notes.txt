@@ -1,5 +1,9 @@
+﻿Activate.ps1: ही PowerShell साठीची स्क्रिप्ट आहे. तुम्ही Visual Studio चे Developer PowerShell वापरता, म्हणून हीच योग्य आहे.
+Activate (extension शिवाय): ही Linux/Mac (bash) साठीची स्क्रिप्ट आहे. Windows PowerShell मध्ये ती चालत नाही.
+ 
 
- python -m venv venv
+
+python -m venv venv
  .\venv\Scripts\activate
 
 pip freeze > requirements.txt
