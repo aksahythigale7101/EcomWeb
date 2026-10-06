@@ -1,0 +1,14 @@
+
+ python -m venv venv
+ .\venv\Scripts\activate
+
+pip freeze > requirements.txt
+
+app>fasatapi dev
+
+
+ alembic  init -t async     -->alembic when alemebci first time create
+
+alembic revision --autogenerate -m "create table"
+
+alembic upgrade head
