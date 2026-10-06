@@ -22,8 +22,8 @@ async def create_user(session: AsyncSession, user: UserCreate):
 
 
 async def authenticate_user(session: AsyncSession, user_login: UserLogin):
-    stmt = select(User).where(User.email == user.email)
-    user = await session.scalars(stmt)
+    stmt = select(User).where(User.email == user_login.email)
+    user = await session.scalar(stmt)
     if not user or not verify_password(user_login.password, user.hashed_password):
         return None
 

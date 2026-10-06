@@ -1,0 +1,45 @@
+from ast import stmt
+from base64 import decode
+import token
+from urllib import request
+from sqlalchemy import select
+from fastapi import HTTPException, status, Request
+from sqlalchemy.sql.functions import user
+from app.account.utils import decode_token
+from app.DB.config import SessionDep
+from app.account.models import User
+
+
+async def get_current_user(session: SessionDep, reques: Request):
+    token = reques.cookies.get("access_token")
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing access token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    payload = decode_token(token)
+    if not payload:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    user_id=payload.get("sub")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid  token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    stmt=select(User).where(User.id==int(user_id))
+    result=await session.scalars(stmt)
+    user =result.first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User Not Found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user

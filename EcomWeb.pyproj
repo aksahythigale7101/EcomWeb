@@ -948,6 +948,7 @@
   <ItemGroup>
     <Content Include="Ecomfastapi\alembic\README" />
     <Content Include="Ecomfastapi\alembic\script.py.mako" />
+    <Content Include="Ecomfastapi\app\account\deps.py" />
     <Content Include="Ecomfastapi\Notes.txt" />
     <Content Include="Ecomfastapi\venv\Lib\site-packages\distutils-precedence.pth" />
     <Content Include="Ecomfastapi\venv\Lib\site-packages\pip-24.0.dist-info\AUTHORS.txt" />

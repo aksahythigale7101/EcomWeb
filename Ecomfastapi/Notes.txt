@@ -1,7 +1,7 @@
 ﻿Activate.ps1: ही PowerShell साठीची स्क्रिप्ट आहे. तुम्ही Visual Studio चे Developer PowerShell वापरता, म्हणून हीच योग्य आहे.
 Activate (extension शिवाय): ही Linux/Mac (bash) साठीची स्क्रिप्ट आहे. Windows PowerShell मध्ये ती चालत नाही.
  
-
+ pip install -r requirements.txt first time download 
 
 python -m venv venv
  .\venv\Scripts\activate
@@ -14,5 +14,5 @@ app>fasatapi dev
  alembic  init -t async     -->alembic when alemebci first time create
 
 alembic revision --autogenerate -m "create table"
-
+python -m alembic revision --autogenerate -m "create users and refresh_tokens tables"
 alembic upgrade head
