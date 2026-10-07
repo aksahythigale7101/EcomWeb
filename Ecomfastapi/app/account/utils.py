@@ -42,9 +42,7 @@ def create_access_token(data: dict, expire_delte: timedelta = None):
 async def create_token(session: AsyncSession, user: User):
     access_token = create_access_token(data={"sub": str(user.id)})
     refresh_token_str = str(uuid.uuid4())
-    expires_at = datetime.now(timezone.utc) + timedelta(
-        days=JWT_REFRESH_TOKEN_TIME_DAY
-    )
+    expires_at = datetime.now(timezone.utc) + timedelta(days=JWT_REFRESH_TOKEN_TIME_DAY)
 
     refresh_token = RefreshToken(
         user_id=user.id, token=refresh_token_str, expires_at=expires_at
@@ -58,27 +56,26 @@ async def create_token(session: AsyncSession, user: User):
     }
 
 
-
-def decode_token(token:str):
+def decode_token(token: str):
     try:
-        return jwt.decode(token,JWT_SECRET_KEY,algorithms=JWT_ALGORITHM)
+        return jwt.decode(token, JWT_SECRET_KEY, algorithms=JWT_ALGORITHM)
     except ExpiredSignatureError:
-        raise HTTPException(status_code=401,detail="Token has expired")
+        raise HTTPException(status_code=401, detail="Token has expired")
     except JWTError:
-        raise HTTPException(status_code=401,detail="Invalid Token")
+        raise HTTPException(status_code=401, detail="Invalid Token")
 
-async def verify_refresh_token(session:AsyncSession,token:str):
-    stmt=select(RefreshToken).where(RefreshToken.token == token)
-    result =await session.scalars(stmt)
-    db_refresh_token= result.first()
+
+async def verify_refresh_token(session: AsyncSession, token: str):
+    stmt = select(RefreshToken).where(RefreshToken.token == token)
+    result = await session.scalars(stmt)
+    db_refresh_token = result.first()
 
     if db_refresh_token and not db_refresh_token.revokrd:
-        expire_at= db_refresh_token.expires_at
+        expire_at = db_refresh_token.expires_at
         if expire_at.tzinfo in None:
-            expire_at=expire_at.replace(tzinfo=timezone.utc)
-        if expire_at >datetime.now(timezone.utc):
-            user_stmt=select(User).where(User.id==db_refresh_token.user_id)
-            user_result =await session.scalars(user_stmt)
+            expire_at = expire_at.replace(tzinfo=timezone.utc)
+        if expire_at > datetime.now(timezone.utc):
+            user_stmt = select(User).where(User.id == db_refresh_token.user_id)
+            user_result = await session.scalars(user_stmt)
             return user_result.first()
     return None
-
