@@ -2,10 +2,27 @@
 import re
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
-from app.account.deps import get_current_user
-from app.account.utils import create_token, verify_refresh_token
-from app.account.schemas import UserCreate, UserOut, UserLogin
-from app.account.services import User, create_user, authenticate_user
+from sqlalchemy.ext.asyncio.session import AsyncSession
+from app.account.deps import get_current_user, required_admin
+from app.account.utils import create_token, revoke_refresh_token, verify_refresh_token
+from app.account.schemas import (
+    PasswordResetEmailRequest,
+    PasswordResetRequest,
+    UserCreate,
+    UserOut,
+    UserLogin,
+    passswordChangeRequest,
+)
+from app.account.services import (
+    User,
+    change_password,
+    create_user,
+    authenticate_user,
+    email_verfication_send,
+    password_reset_email_send,
+    verify_email_token,
+    verify_password_reset_token,
+)
 from app.DB.config import SessionDep
 from fastapi import HTTPException, status
 
@@ -87,3 +104,52 @@ async def refresh_token(session: SessionDep, request: Request):
     )
     # return user
     return response
+
+
+@router.post("/send-verification-email")
+async def send_verification_email(user: User = Depends(get_current_user)):
+    return await email_verfication_send(user)
+
+
+@router.get("/verify-email")
+async def verify_email(session: SessionDep, token: str):
+    return await verify_email_token(session, token)
+
+
+@router.post("/change-password")
+async def password_change(
+    session: SessionDep,
+    data: passswordChangeRequest,
+    user: User = Depends(get_current_user),
+):
+    return await change_password(session, user, data)
+    # return {"msg": "password changes succesfully"}
+
+
+@router.post("/send-password-reset-email")
+async def sent_password_reset_email(
+    session: SessionDep, data: PasswordResetEmailRequest
+):
+    return await  password_reset_email_send(session, data)
+
+
+@router.post("/verify-password-reset-token")
+async def verify_password_reset_email(session: SessionDep, data: PasswordResetRequest):
+    return await verify_password_reset_token(session, data)
+
+
+@router.get("/admin")
+async def admin (user:User =Depends(required_admin)):
+    return {"msg": f"welcome user admin {user.email}"}
+
+
+                
+@router.post("/logout")
+async def logout(session: SessionDep, request: Request, user: User = Depends(get_current_user)):
+  refresh_token = request.cookies.get("refresh_token")
+  if refresh_token:
+    await revoke_refresh_token(session, refresh_token)
+  response = JSONResponse(content={"detail": "Logged out"})
+  response.delete_cookie("refresh_token")
+  response.delete_cookie("access_token")
+  return response

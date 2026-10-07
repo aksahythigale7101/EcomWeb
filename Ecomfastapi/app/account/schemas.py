@@ -1,5 +1,7 @@
 
-from pydantic import BaseModel, EmailStr
+import email
+from statistics import mean
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 class UserBase(BaseModel):
@@ -20,3 +22,39 @@ class UserOut(UserBase):
 
 class UserLogin(UserCreate):
     email: EmailStr
+
+
+class passswordChangeRequest(BaseModel):
+    old_password: str = Field(...)
+    new_password: str = Field(..., min_length=8)
+
+    @field_validator("new_password")
+    @classmethod
+    def valudate_new_password_strength(cls, value: str) -> str:
+        if value.lower() == value or value.upper() == value:
+            raise ValueError(
+                "Passwod must contain both upper and lower level case letters"
+            )
+        if not any(char.isdigit() for char in value):
+            raise ValueError("Passwaord must contain in one digit ")
+        return value
+
+
+class PasswordResetEmailRequest(BaseModel):
+    email: EmailStr
+
+
+class PasswordResetRequest(BaseModel):
+    token: str 
+    new_password: str = Field(..., min_length=8)
+
+    @field_validator("new_password")
+    @classmethod
+    def valudate_new_password_strength(cls, value: str) -> str:
+        if value.lower() == value or value.upper() == value:
+            raise ValueError(
+                "Passwod must contain both upper and lower level case letters"
+            )
+        if not any(char.isdigit() for char in value):
+            raise ValueError("Passwaord must contain in one digit ")
+        return value

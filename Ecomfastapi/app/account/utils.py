@@ -1,8 +1,7 @@
 
 from ctypes import cast
 from sqlalchemy import select
-import time
-from turtle import ht, st
+
 import uuid
 from fastapi import HTTPException
 from passlib.context import CryptContext
@@ -17,6 +16,9 @@ JWT_SECRET_KEY = config("JWT_SECRET_KEY")
 JWT_ALGORITHM = config("JWT_ALGORITHM")
 JWT_ACCESS_TOKEN_TIME_MIN = config("JWT_ACCESS_TOKEN_TIME_MIN", cast=int)
 JWT_REFRESH_TOKEN_TIME_DAY = config("JWT_REFRESH_TOKEN_TIME_DAY", cast=int)
+EMAIL_VERIFICATION_TOKEN_TIME_HOUR= config("EMAIL_VERIFICATION_TOKEN_TIME_HOUR", cast=int)
+EMAIL_PASSWOED_RESET_TOKEN_TIME_HOUR= config("EMAIL_PASSWOED_RESET_TOKEN_TIME_HOUR", cast=int)
+
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -51,7 +53,7 @@ async def create_token(session: AsyncSession, user: User):
     await session.commit()
     return {
         "access_token": access_token,
-        "refresh_token": refresh_token,
+        "refresh_token": refresh_token_str,
         "token_type": "bearer",
     }
 
@@ -70,12 +72,57 @@ async def verify_refresh_token(session: AsyncSession, token: str):
     result = await session.scalars(stmt)
     db_refresh_token = result.first()
 
-    if db_refresh_token and not db_refresh_token.revokrd:
+    if db_refresh_token and not db_refresh_token.revoked:
         expire_at = db_refresh_token.expires_at
-        if expire_at.tzinfo in None:
+        if expire_at.tzinfo is None:
             expire_at = expire_at.replace(tzinfo=timezone.utc)
         if expire_at > datetime.now(timezone.utc):
             user_stmt = select(User).where(User.id == db_refresh_token.user_id)
             user_result = await session.scalars(user_stmt)
             return user_result.first()
     return None
+
+def create_email_verification_token(user_id: int):
+  expire = datetime.now(timezone.utc) + timedelta(hours=EMAIL_VERIFICATION_TOKEN_TIME_HOUR)
+  to_encode = {"sub": str(user_id), "type": "verify_email", "exp": expire}
+  return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    
+def verify_email_token_and_get_user_id(token: str, token_type: str):
+  payload = decode_token(token)
+  if not payload or payload.get("type") != token_type:
+    return None
+  return int(payload.get("sub"))
+
+async def get_user_by_email(session: AsyncSession, email:str):
+  stmt = select(User).where(User.email == email)
+  result = await session.scalars(stmt)
+  user = result.first() 
+  return user
+
+
+
+
+
+
+
+def crate_password_reset_token(user_id: int):
+  expire = datetime.now(timezone.utc) + timedelta(hours=EMAIL_PASSWOED_RESET_TOKEN_TIME_HOUR)
+  to_encode = {"sub": str(user_id), "type": "password_reset", "exp": expire}
+  return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    
+
+def verify_password_reet_token_and_get_user_id(token: str, token_type: str):
+  payload = decode_token(token)
+  if not payload or payload.get("type") != token_type:
+    return None
+  return int(payload.get("sub"))
+
+
+async def revoke_refresh_token(session: AsyncSession, token: str):
+    stmt = select(RefreshToken).where(RefreshToken.token == token)
+    result = await session.scalars(stmt)
+    db_refresh_token = result.first()
+
+    if db_refresh_token:
+        db_refresh_token.revoked = True
+        await session.commit()

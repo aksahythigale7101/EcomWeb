@@ -1,9 +1,11 @@
 from ast import stmt
 from base64 import decode
-import token
+from http.client import FORBIDDEN
+
 from urllib import request
+
 from sqlalchemy import select
-from fastapi import HTTPException, status, Request
+from fastapi import Depends, HTTPException, status, Request
 from sqlalchemy.sql.functions import user
 from app.account.utils import decode_token
 from app.DB.config import SessionDep
@@ -43,3 +45,13 @@ async def get_current_user(session: SessionDep, reques: Request):
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
+
+
+
+async def required_admin(user:User=Depends(get_current_user)):
+    if not user.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Admin access required")
+
+    return user
+
