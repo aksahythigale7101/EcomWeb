@@ -1,2 +1,6 @@
 from app.account import models as account_models
 from app.product import models as product_model
+from app.cart import models as cart_model
+from app.shipping import models as shipping_model
+from app.order import models as order_model
+from app.payment import models as payment_model

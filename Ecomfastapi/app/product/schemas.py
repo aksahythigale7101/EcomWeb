@@ -45,3 +45,17 @@ class PaginatedProductOut(BaseModel):
     page: int
     limit: int
     items: list[ProductOut]
+
+
+
+
+class ProductUpdate(BaseModel):
+    title : str | None = None
+    description : str | None = None
+    price : float | None = None
+    stock_quantity : int | None = None
+    image_url : str | None = None
+    category_ids: list[int] | None = None
+    model_config = {
+        "from_attributes": True
+    }

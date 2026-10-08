@@ -4,7 +4,10 @@ from sqlalchemy import String, Integer, Float, DateTime, ForeignKey, Table, Colu
 from datetime import datetime, timezone
 from app.DB.base import Base
 
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+  from app.cart.models import CartItem
 
 product_category_table = Table(
     "product_category",
@@ -36,6 +39,8 @@ class Product(Base):
   updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc),onupdate=lambda: datetime.now(timezone.utc))
 
   categories: Mapped[list["Category"]] = relationship("Category", secondary=product_category_table, back_populates="products")
+  cart_items: Mapped[list["CartItem"]] = relationship("CartItem", back_populates="product")
+
 
 
 class Category(Base):

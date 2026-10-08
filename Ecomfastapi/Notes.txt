@@ -15,4 +15,19 @@ app>fasatapi dev
 
 alembic revision --autogenerate -m "create table"
 python -m alembic revision --autogenerate -m "create users and refresh_tokens tables"
+alembic revision --autogenerate -m "create cart item table"
 alembic upgrade head
+
+
+
+delete loacl as well as github
+git rm -r folder or file name
+git commit -m "Remove folder_name"
+git push origin main
+
+
+{
+  "email": "akshay@example.com",
+
+  "password": "Akshay7101"
+}

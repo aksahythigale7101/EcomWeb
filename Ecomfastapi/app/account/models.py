@@ -1,9 +1,14 @@
 
-from email.policy import default
+from typing import TYPE_CHECKING
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Null, String, Boolean, DateTime, ForeignKey
 from datetime import datetime, timezone
 from app.DB.base import Base
+
+if TYPE_CHECKING:
+    from app.cart.models import CartItem
+    from app.shipping.models import ShippingAddress
+    from app.payment.models import Payment
 
 
 class User(Base):
@@ -32,6 +37,15 @@ class User(Base):
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
         "RefreshToken", back_populates="user", cascade="all, delete-orphan"
     )
+    cart_items: Mapped[list["CartItem"]] = relationship(
+        "CartItem", back_populates="user", cascade="all, delete-orphan"
+    )
+    shipping_addresses: Mapped[list["ShippingAddress"]] = relationship(
+        "ShippingAddress", back_populates="user", cascade="all, delete-orphan"
+    )
+    payments: Mapped[list["Payment"]] = relationship(
+        "Payment", back_populates="user", cascade="all, delete-orphan"
+    )
 
 
 class RefreshToken(Base):
@@ -39,9 +53,7 @@ class RefreshToken(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("user.id", ondelete="CASCADE")
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"))
 
     token: Mapped[str] = mapped_column(String(255), nullable=False)
 
