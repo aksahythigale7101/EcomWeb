@@ -989,23 +989,29 @@
     <Folder Include="ecommnextjs\app\product\" />
     <Folder Include="ecommnextjs\app\product\[slug]\" />
     <Folder Include="ecommnextjs\app\cart\" />
+    <Folder Include="ecommnextjs\app\user\" />
+    <Folder Include="ecommnextjs\app\user\address\" />
+    <Folder Include="ecommnextjs\app\user\address\create\" />
+    <Folder Include="ecommnextjs\app\user\address\edit\" />
+    <Folder Include="ecommnextjs\app\user\address\edit\[id]\" />
+    <Folder Include="ecommnextjs\app\user\category\create\" />
+    <Folder Include="ecommnextjs\app\user\dashboard\" />
+    <Folder Include="ecommnextjs\app\user\category\" />
+    <Folder Include="ecommnextjs\app\user\product\" />
+    <Folder Include="ecommnextjs\app\user\order\" />
+    <Folder Include="ecommnextjs\app\user\payments\" />
+    <Folder Include="ecommnextjs\app\user\product\create\" />
+    <Folder Include="ecommnextjs\app\user\product\edit\" />
+    <Folder Include="ecommnextjs\app\user\product\edit\[slug]\" />
+    <Folder Include="ecommnextjs\app\user\shippingstatus\" />
     <Folder Include="ecommnextjs\components\" />
     <Folder Include="ecommnextjs\components\user\" />
     <Folder Include="ecommnextjs\context\" />
     <Folder Include="ecommnextjs\hooks\" />
     <Folder Include="ecommnextjs\app\login\" />
-    <Folder Include="ecommnextjs\user\" />
     <Folder Include="ecommnextjs\public\" />
     <Folder Include="ecommnextjs\app\register\" />
     <Folder Include="ecommnextjs\app\unauthorized\" />
-    <Folder Include="ecommnextjs\user\address\" />
-    <Folder Include="ecommnextjs\user\address\create\" />
-    <Folder Include="ecommnextjs\user\address\edit\" />
-    <Folder Include="ecommnextjs\user\address\edit\[id]\" />
-    <Folder Include="ecommnextjs\user\dashboard\" />
-    <Folder Include="ecommnextjs\user\shippingstatus\" />
-    <Folder Include="ecommnextjs\user\payments\" />
-    <Folder Include="ecommnextjs\user\order\" />
     <Folder Include="ecommnextjs\utils\" />
   </ItemGroup>
   <ItemGroup>
@@ -1823,6 +1829,18 @@
     <Content Include="ecommnextjs\app\product\page.jsx" />
     <Content Include="ecommnextjs\app\product\[slug]\page.jsx" />
     <Content Include="ecommnextjs\app\cart\page.jsx" />
+    <Content Include="ecommnextjs\app\user\address\create\page.jsx" />
+    <Content Include="ecommnextjs\app\user\address\edit\[id]\page.jsx" />
+    <Content Include="ecommnextjs\app\user\category\create\page.jsx" />
+    <Content Include="ecommnextjs\app\user\category\page.jsx" />
+    <Content Include="ecommnextjs\app\user\dashboard\page.jsx" />
+    <Content Include="ecommnextjs\app\user\order\page.jsx" />
+    <Content Include="ecommnextjs\app\user\page.jsx" />
+    <Content Include="ecommnextjs\app\user\payments\page.jsx" />
+    <Content Include="ecommnextjs\app\user\product\create\page.jsx" />
+    <Content Include="ecommnextjs\app\user\product\edit\[slug]\page.jsx" />
+    <Content Include="ecommnextjs\app\user\product\page.jsx" />
+    <Content Include="ecommnextjs\app\user\shippingstatus\page.jsx" />
     <Content Include="ecommnextjs\components\AdminOnly.jsx" />
     <Content Include="ecommnextjs\components\Footer.jsx" />
     <Content Include="ecommnextjs\components\Hero.jsx" />
@@ -1846,13 +1864,6 @@
     <Content Include="ecommnextjs\README.md" />
     <Content Include="ecommnextjs\app\register\page.jsx" />
     <Content Include="ecommnextjs\app\unauthorized\page.jsx" />
-    <Content Include="ecommnextjs\user\address\create\page.jsx" />
-    <Content Include="ecommnextjs\user\address\edit\[id]\page.jsx" />
-    <Content Include="ecommnextjs\user\dashboard\page.jsx" />
-    <Content Include="ecommnextjs\user\order\page.jsx" />
-    <Content Include="ecommnextjs\user\page.jsx" />
-    <Content Include="ecommnextjs\user\payments\page.jsx" />
-    <Content Include="ecommnextjs\user\shippingstatus\page.jsx" />
     <Content Include="ecommnextjs\utils\axios.js" />
   </ItemGroup>
   <ItemGroup>
