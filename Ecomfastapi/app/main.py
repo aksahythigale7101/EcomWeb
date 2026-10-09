@@ -7,7 +7,25 @@ from app.cart.routers import router as cart_router
 from app.shipping.routers import router as shipping_router
 from app.order.routers import router as order_router
 from app.payment.routers import router as payment_router
+
+from fastapi.middleware.cors import CORSMiddleware
+from decouple import config
+from fastapi.staticfiles import StaticFiles
+
+
 app = FastAPI(title="FastApit E-Commerce Backend")
+
+
+app.mount("/media", StaticFiles(directory="media"), name="media")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[config("FRONTEND_URL")],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 
 # @app.get("/")
