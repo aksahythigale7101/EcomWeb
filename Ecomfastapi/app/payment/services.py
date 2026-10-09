@@ -60,4 +60,4 @@ async def get_payment_by_order_id(
 async def list_payments_by_user(session: AsyncSession, user_id: int):
   stmt = select(Payment).where(Payment.user_id == user_id)
   result = await session.execute(stmt)
-  return
+  return result.scalars().all()

@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.DB.config import SessionDep
 from app.account.models import User
 from app.account.deps import get_current_user, required_admin
-from app.shipping.schemas import ShippingAddressOut, ShippingAddressCreate, ShippingAddressUpdate
+from app.shipping.schemas import ShippingAddressOut, ShippingAddressCreate, ShippingAddressUpdate, ShippingStatusOut, ShippingStatusUpdate
 from app.shipping.models import ShippingAddress
-from app.shipping.services import create_shipping_address, delete_shipping_address_by_address_id, get_user_shipping_address_by_address_id, list_user_shipping_addresses, update_user_shipping_address_by_address_id
+from app.shipping.services import create_shipping_address, delete_shipping_address_by_address_id, get_user_order_shipping_status, get_user_shipping_address_by_address_id, list_user_shipping_addresses, update_shipping_status, update_user_shipping_address_by_address_id
 
 router = APIRouter()
+
 
 @router.post("/addresses", response_model=ShippingAddressOut)
 async def shipping_address_create(
@@ -15,7 +16,6 @@ async def shipping_address_create(
   user: User = Depends(get_current_user)
 ):
   return await create_shipping_address(session, user.id, data)
-
 
 @router.get("/addresses", response_model=list[ShippingAddressOut])
 async def shipping_addresses_user_list(
@@ -48,3 +48,20 @@ async def shipping_address_delete_by_address_id(
   user: User = Depends(get_current_user)
 ):
   return await delete_shipping_address_by_address_id(session, user.id, address_id)
+
+@router.get("/status/{order_id}", response_model=ShippingStatusOut)
+async def shipping_status_for_user_order(
+  session: SessionDep,
+  order_id: int,
+  user: User = Depends(get_current_user)
+):
+  return await get_user_order_shipping_status(session, order_id, user.id)
+
+@router.patch("/status/{order_id}", response_model=ShippingStatusOut)
+async def change_shipping_status(
+    session: SessionDep,
+    order_id: int,
+    data: ShippingStatusUpdate,
+    admin_user = Depends(required_admin)  # Only admin can update
+):
+    return await update_shipping_status(session, order_id, data.status)

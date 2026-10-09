@@ -1,9 +1,9 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-
+from app.order.models import Order
 from app.shipping.schemas import ShippingAddressCreate, ShippingAddressOut, ShippingAddressUpdate
-from app.shipping.models import ShippingAddress
+from app.shipping.models import ShippingAddress, ShippingStatus, ShippingStatusEnum
 
 async def create_shipping_address(
     session: AsyncSession,
@@ -15,7 +15,6 @@ async def create_shipping_address(
   await session.commit()
   await session.refresh(address)
   return address
-
 
 # SELECT * FROM shipping_address WHERE user_id = :user_id
 async def list_user_shipping_addresses(
@@ -52,7 +51,6 @@ async def update_user_shipping_address_by_address_id(
   await session.refresh(address)
   return address
 
-
 async def delete_shipping_address_by_address_id(
   session: AsyncSession, 
   user_id: int, 
@@ -64,3 +62,41 @@ async def delete_shipping_address_by_address_id(
   await session.delete(address)
   await session.commit()
   return {"message": "Address deleted"}
+
+async def get_user_order_shipping_status(
+    session: AsyncSession,
+    order_id: int,
+    user_id: int
+):
+  stmt = select(Order).where(Order.id == order_id, Order.user_id == user_id)
+  result = await session.execute(stmt)
+  order = result.scalar_one_or_none()
+  if not order:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found or not authorized")
+  
+  stmt = select(ShippingStatus).where(ShippingStatus.order_id == order_id)
+  result = await session.execute(stmt)
+  shipping_status = result.scalar_one_or_none()
+  if not shipping_status:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shipping status not found for this order")
+  return shipping_status
+
+async def update_shipping_status(
+    session: AsyncSession,
+    order_id: int,
+    new_status: ShippingStatusEnum
+):
+  stmt = select(ShippingStatus).where(ShippingStatus.order_id == order_id)
+  result = await session.execute(stmt)
+  shipping_status = result.scalar_one_or_none()
+
+  if not shipping_status:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Shipping status not found")
+  
+  shipping_status.status = new_status
+  await session.commit()
+  await session.refresh(shipping_status)
+  return shipping_status
+
+
+  
